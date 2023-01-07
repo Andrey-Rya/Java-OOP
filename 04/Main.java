@@ -1,86 +1,53 @@
+import Work.FileTask;
+import Work.Priority;
+import ReadWrite.Comparison;
+import ReadWrite.TextReader;
+import ReadWrite.TextWriter;
+
+import java.net.SocketOption;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Main {
+    public static void main(String[] args) {
 
-    static void findWaitingTime(int processes[], int n, int bt[], int wt[], int at[])
-    {
-        int service_time[] = new int[n];
-        service_time[0] = at[0];
-        wt[0] = 0;
 
-        // расчет времени ожидания
-        for (int i = 1; i < n ; i++)
-        {
-            //потерянное время
-            int wasted=0;
-            // время разрыва предыдущих процессов
-            service_time[i] = service_time[i-1] + bt[i-1];
+        FileTask fileTask = new FileTask(1,"Алена", Priority.PriorityHigh // высокий приоритет
+                , new Date(123, 00,07),"Сделать уборку во всех комнатах");
 
-            // Нахождение времени ожидания для текущего процесса =
-            // sum - at[i]
-            wt[i] = service_time[i] - at[i];
+        FileTask fileTask1 = new FileTask(2,"Елена", Priority.PriorityMedium // средний приоритет
+                , new Date(123,00,07),"Помыть полы и сварить обед");
 
-            if (wt[i] < 0) {
-                wasted = Math.abs(wt[i]);
-                wt[i] = 0;
-            }
-            //Добавить потерянное время
-            service_time[i] = service_time[i] + wasted;
-        }
-    }
+        FileTask fileTask2 = new FileTask(3,"Андрей", Priority.PriorityIsLow // низкий приоритет
+                , new Date(123,00,07),"Вынести мусор и сходить в магазин");
 
-    // Функция для расчета времени выполнения
-    static void findTurnAroundTime(int processes[], int n, int bt[],
-                                   int wt[], int tat[])
-    {
-        // Расчет времени выполнения путем добавления bt[i] + wt[i]
-        for (int i = 0; i < n ; i++)
-            tat[i] = bt[i] + wt[i];
-    }
 
-    // Функция для расчета среднего значения количества раз ожидания и выполнения
-
-    static void findavgTime(int processes[], int n, int bt[], int at[])
-    {
-        int wt[] = new int[n], tat[] = new int[n];
-
-        // Функция для нахождения времени ожидания всех процессов
-        findWaitingTime(processes, n, bt, wt, at);
-
-        // Функция для нахождения времени выполнения для всех процессов
-        findTurnAroundTime(processes, n, bt, wt, tat);
-
-        System.out.print("Процессы " + " Время разрыва процессов " + " Время поступления "
-                + " Время ожидания " + " Время выполнения "
-                + " Время завершения \n");
-        int total_wt = 0, total_tat = 0;
-        for (int i = 0 ; i < n ; i++)
-        {
-            total_wt = total_wt + wt[i];
-            total_tat = total_tat + tat[i];
-            int compl_time = tat[i] + at[i];
-            System.out.println(i+1 + "\t\t" + bt[i] + "\t\t"
-                    + at[i] + "\t\t" + wt[i] + "\t\t "
-                    + tat[i] + "\t\t " + compl_time);
+        System.out.println("Перечислены все приоритеты без сортировки:");
+        List<FileTask> fileTaskList = Arrays.asList(fileTask2,fileTask,fileTask1);
+        for (FileTask task : fileTaskList) {
+            System.out.println("id " + task.getId() + " * " + task.getDate() + " * " + task.getFio() + " - "+ task.getText());
         }
 
-        System.out.print("Среднее время ожидания = "
-                + (float)total_wt / (float)n);
-        System.out.print("\nСреднее время выполнения = "
-                + (float)total_tat / (float)n);
-        System.out.println();
-    }
+        System.out.println("\nА теперь показываем приоритеты в порядке убывания:");
+        List<FileTask> compareByFileTask = Arrays.asList(fileTask,fileTask1,fileTask2);
+        Comparison comparisons = new Comparison();
+        fileTaskList.sort(comparisons);
 
-    public static void main(String args[]) {
-        // Идентификаторы процессов
-        int processes[] = {1, 2, 3};
-        int n = processes.length;
+        for (FileTask task : fileTaskList) {
+            System.out.println("id " + task.getId() + " * " + task.getDate() + " * " + task.getFio() + " - "+ task.getText());
+        }
 
-        // Время разрыва всех процессов
-        int burst_time[] = {5, 9, 6};
+        TextWriter textWriter = new TextWriter();
+        textWriter.textWriter(fileTask);
 
-        // Время поступления всех процессов
-        int arrival_time[] = {0, 3, 6};
+        System.out.println("\nЧтение из файла 'base.txt' информации о самом высоком приоритете");
 
-        findavgTime(processes, n, burst_time, arrival_time);
+        TextReader textReader = new TextReader();
+        textReader.textReader("base.txt");
 
     }
+
 }
